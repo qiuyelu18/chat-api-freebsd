@@ -66,15 +66,18 @@ jobs:
         run: |
           echo "release_tag=$(wget -qO- https://api.github.com/repos/ai365vip/chat-api/tags | gawk -F '["v]' '/name/{print "v"$5;exit}')" >> $GITHUB_OUTPUT
 
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: |
-                chat-api/chat-api
-              
+      - name: Install GitHub CLI
+        run: |
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+
+      - name: Create release with GitHub CLI
+        run: |
+          echo "${{ secrets.PAT_TOKEN }}" | gh auth login --with-token
+          gh release create ${{ steps.tag.outputs.release_tag }} chat-api/chat-api --title "Release ${{ steps.tag.outputs.release_tag }}" --notes "Automated build for FreeBSD"
+
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
         with:
