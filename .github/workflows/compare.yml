@@ -12,8 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: compare versions
         run: |
-          export REMOTEVERSION=$(wget -qO- https://api.github.com/repos/username/chat-api/tags | gawk -F '["v]' '/name/{print "v"$5;exit}')
-          export LOCALVERSION=$(curl --location --silent --fail --show-error "https://api.github.com/repos/username/chat-api-freebsd/releases/latest" | grep -oP '"tag_name":\s*"\K[^"]+')
+          export REMOTEVERSION=$(wget -qO- https://api.github.com/repos/ai365vip/chat-api/tags | gawk -F '["v]' '/name/{print "v"$5;exit}')
+          # 以下username需替换为您自己的GitHub用户名
+          export LOCALVERSION=$(curl --location --silent --fail --show-error "https://api.github.com/repos/qiuyelu18/chat-api-freebsd/releases/latest" | grep -oP '"tag_name":\s*"\K[^"]+')
           bash compare.sh
           
       - name: Trigger release
@@ -22,8 +23,9 @@ jobs:
         with:
           github-token: ${{ secrets.PAT_TOKEN }}
           script: |
+              # 以下username需替换为您自己的GitHub用户名
               await github.rest.actions.createWorkflowDispatch({
-              owner: 'username',
+              owner: 'qiuyelu18',
               repo: 'chat-api-freebsd',
               workflow_id: 'build.yml',
               ref: 'main'
